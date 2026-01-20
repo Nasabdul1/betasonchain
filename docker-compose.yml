@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # Main backend service
+  betasonchain-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=4096
+      PORT: 3001
+      # RPC endpoints (update with your keys)
+      SOLANA_RPC_1: https://api.mainnet-beta.solana.com
+      SOLANA_RPC_2: https://api.mainnet-beta.solana.com
+      SOLANA_RPC_3: https://api.mainnet-beta.solana.com
+      # Cache settings
+      CACHE_TTL: 300000
+      MAX_CACHE_SIZE: 10000
+      # Rate limiting
+      RATE_LIMIT_WINDOW: 60000
+      RATE_LIMIT_MAX_REQUESTS: 100
+      # Queue
+      MAX_QUEUE_SIZE: 5000
+      MAX_CONCURRENT_REQUESTS: 50
+      # CORS
+      CORS_ORIGIN: '*'
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - betasonchain
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
+
+  # Optional: Nginx reverse proxy + load balancer
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - betasonchain-backend
+    networks:
+      - betasonchain
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Optional: Redis for distributed caching (future enhancement)
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   networks:
+  #     - betasonchain
+  #   restart: unless-stopped
+  #   command: redis-server --appendonly yes
+
+networks:
+  betasonchain:
+    driver: bridge
+
+# volumes:
+#   redis-data:
+#     driver: local
+
+# Usage:
+# docker-compose up -d              # Start all services
+# docker-compose down               # Stop all services
+# docker-compose logs -f            # View logs
+# docker-compose ps                 # Show status
+# docker-compose exec betasonchain-backend npm test  # Run tests

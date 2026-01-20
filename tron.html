@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Betasonchain Terminal - Tron</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ef4444","primary-dark": "#dc2626",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0a0a", // Deep black for terminal feel
+                        "surface-dark": "#121212", // Slightly lighter for cards
+                        "surface-border": "#27272a", // Subtle borders
+                        "text-muted": "#a1a1aa",
+                        "danger": "#ef4444",
+                        "success": "#22c55e",
+                        "warning": "#eab308",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"], 
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121212; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46; 
+        }
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .data-table-row:hover td {
+            background-color: rgba(239, 68, 68, 0.05);}
+        .chain-tab {
+            transition: all 0.2s ease;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display h-screen flex overflow-hidden selection:bg-primary selection:text-white">
+<aside class="w-16 lg:w-64 border-r border-surface-border bg-[#111318] flex flex-col justify-between shrink-0 transition-all duration-300">
+<div class="flex flex-col">
+<div class="h-16 flex items-center px-4 lg:px-6 border-b border-surface-border/50">
+<div class="size-8 rounded bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white text-[20px]">terminal</span>
+</div>
+<div class="hidden lg:flex flex-col ml-3">
+<h1 class="text-sm font-bold tracking-wider text-white">BETASONCHAIN</h1>
+<div class="flex items-center gap-1.5">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+</span>
+<span class="text-[10px] uppercase text-text-muted font-medium tracking-wide">Live Feed</span>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-1 p-3">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 border border-primary/20 group" href="#">
+<span class="material-symbols-outlined text-primary group-hover:text-white transition-colors" style="font-size: 20px;">radar</span>
+<span class="hidden lg:block text-sm font-medium text-white">Discovery</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-border/50 group transition-all" href="#">
+<span class="material-symbols-outlined text-text-muted group-hover:text-white transition-colors" style="font-size: 20px;">star</span>
+<span class="hidden lg:block text-sm font-medium text-text-muted group-hover:text-white">Watchlist</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-border/50 group transition-all" href="#">
+<span class="material-symbols-outlined text-text-muted group-hover:text-white transition-colors" style="font-size: 20px;">history</span>
+<span class="hidden lg:block text-sm font-medium text-text-muted group-hover:text-white">Scan History</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-border/50 group transition-all" href="#">
+<span class="material-symbols-outlined text-text-muted group-hover:text-white transition-colors" style="font-size: 20px;">analytics</span>
+<span class="hidden lg:block text-sm font-medium text-text-muted group-hover:text-white">Reports</span>
+</a>
+</nav>
+</div>
+<div class="p-3 border-t border-surface-border/50">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-border/50 group transition-all" href="#">
+<span class="material-symbols-outlined text-text-muted group-hover:text-white transition-colors" style="font-size: 20px;">settings</span>
+<span class="hidden lg:block text-sm font-medium text-text-muted group-hover:text-white">System Config</span>
+</a>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-background-dark relative">
+<div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none z-0"></div>
+<div class="absolute inset-0 pointer-events-none z-0" style="background-image: radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.08), transparent 40%);"></div>
+<header class="shrink-0 border-b border-surface-border bg-background-dark/95 backdrop-blur-md sticky top-0 z-20 flex flex-col items-center justify-center py-5 px-6 lg:px-10 gap-5">
+<div class="w-full max-w-4xl flex items-center justify-center">
+<div class="flex items-center p-1 rounded-lg bg-[#111318] border border-surface-border shadow-md overflow-x-auto max-w-full">
+<a href="solana.html" class="chain-tab px-4 py-1.5 rounded text-xs font-medium text-text-muted hover:text-white hover:bg-surface-border/50 whitespace-nowrap transition-all">SOLANA</a>
+<a href="bnb.html" class="chain-tab px-4 py-1.5 rounded text-xs font-medium text-text-muted hover:text-white hover:bg-surface-border/50 whitespace-nowrap transition-all">BNB</a>
+<a href="base.html" class="chain-tab px-4 py-1.5 rounded text-xs font-medium text-text-muted hover:text-white hover:bg-surface-border/50 whitespace-nowrap transition-all">BASE</a>
+<a href="sui.html" class="chain-tab px-4 py-1.5 rounded text-xs font-medium text-text-muted hover:text-white hover:bg-surface-border/50 whitespace-nowrap transition-all">SUI</a>
+<a href="eth.html" class="chain-tab px-4 py-1.5 rounded text-xs font-medium text-text-muted hover:text-white hover:bg-surface-border/50 whitespace-nowrap transition-all">ETH</a>
+<a href="ton.html" class="chain-tab px-4 py-1.5 rounded text-xs font-medium text-text-muted hover:text-white hover:bg-surface-border/50 whitespace-nowrap transition-all">TON</a>
+<a href="btc.html" class="chain-tab px-4 py-1.5 rounded text-xs font-medium text-text-muted hover:text-white hover:bg-surface-border/50 whitespace-nowrap transition-all">BTC</a>
+<a href="tron.html" class="chain-tab px-4 py-1.5 rounded text-xs font-bold bg-primary text-white shadow-[0_0_10px_rgba(239,68,68,0.4)] whitespace-nowrap">TRON</a>
+</div>
+</div>
+<div class="w-full max-w-2xl relative">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-text-muted" style="font-size: 20px;">search</span>
+</div>
+<input class="block w-full rounded-md border-surface-border bg-[#1c1f27] py-2.5 pl-11 pr-4 text-sm text-white placeholder-text-muted focus:border-primary focus:ring-1 focus:ring-primary focus:bg-[#222630] transition-all shadow-[0_0_15px_rgba(0,0,0,0.3)]" placeholder="Paste Token Address (e.g. T9y...8j9) to scan for narrative beta..." type="text" value="TKpQGSJ5...J8KqW (Mock)"/>
+<div class="absolute inset-y-0 right-0 pr-2 flex items-center">
+<kbd class="inline-flex items-center border border-surface-border rounded px-2 text-[10px] font-sans font-medium text-text-muted">⌘ K</kbd>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-6 lg:p-10 z-10 scroll-smooth">
+<div class="max-w-7xl mx-auto flex flex-col gap-8">
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div class="lg:col-span-2 rounded-lg bg-[#111318] border border-surface-border p-5 shadow-lg relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-50 pointer-events-none">
+<span class="material-symbols-outlined text-surface-border text-[120px] -rotate-12 translate-x-8 -translate-y-8">token</span>
+</div>
+<div class="flex justify-between items-start relative z-10">
+<div class="flex gap-5">
+<div class="size-16 rounded-lg bg-surface-border flex items-center justify-center overflow-hidden border border-white/5 shadow-inner bg-cover bg-center" data-alt="Token logo placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBRJxQ9y4cce8ucAFsWnolN45mTJi4RDpe0Ntu2yuqsN2aJ81MDXMHEoHQBvap69MvExVL2rfCGRfrDbTQN0GvsZiPjxt7KgVVoGl0VHTU37AZYhuPJof6GPUnsNlinpZFdF-hLn4XLgXg4B8stB7hER0fCzrgQ7ZNCF8-dc6xFKS5ZeuO3IYSgsx4AdS8kJs_Jpe2DX4vu9stWym3IWpLW73B_5Ua9t4NgnPtPWEL87i4Qu45qU-aM8Su2THl02zhv4sS7mnfBVBE');"></div>
+<div>
+<div class="flex items-center gap-3">
+<h2 class="text-xl font-bold text-white tracking-tight">$WIF</h2>
+<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-primary/20 text-primary border border-primary/20">Active Narrative</span>
+</div>
+<p class="text-text-muted text-sm mt-1">dogwifhat</p>
+<div class="flex items-center gap-4 mt-3">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-text-muted font-semibold">Market Cap</span>
+<span class="text-base font-bold text-white font-mono">$2.42B</span>
+</div>
+<div class="w-px h-8 bg-surface-border"></div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-text-muted font-semibold">Volume (24h)</span>
+<span class="text-base font-bold text-white font-mono">$184M</span>
+</div>
+<div class="w-px h-8 bg-surface-border"></div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-wider text-text-muted font-semibold">Age</span>
+<span class="text-base font-bold text-white">4mo 12d</span>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-2">
+<span class="px-3 py-1 rounded-full text-xs font-medium bg-[#282e39] text-white border border-surface-border">Memecoin</span>
+<span class="px-3 py-1 rounded-full text-xs font-medium bg-[#282e39] text-white border border-surface-border">Dog</span>
+<span class="px-3 py-1 rounded-full text-xs font-medium bg-[#282e39] text-white border border-surface-border">Tron</span>
+</div>
+</div>
+</div>
+<div class="rounded-lg bg-[#111318] border border-surface-border p-5 flex flex-col shadow-lg">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-xs uppercase tracking-widest text-text-muted font-semibold">Developer Dossier</h3>
+<span class="text-xs text-primary font-medium cursor-pointer hover:underline">View Wallet</span>
+</div>
+<div class="flex items-center gap-3 mb-4">
+<div class="flex -space-x-2 overflow-hidden">
+<div class="inline-block h-6 w-6 rounded-full bg-zinc-800 ring-2 ring-[#111318] flex items-center justify-center text-[10px] text-zinc-400">Dev</div>
+</div>
+<span class="text-sm font-mono text-white truncate w-24">8x...9jL2</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20">Safe</span>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between text-xs">
+<span class="text-text-muted">Prev. Launches</span>
+<span class="text-white font-mono">5</span>
+</div>
+<div class="flex w-full h-2 rounded-full overflow-hidden bg-surface-border">
+<div class="bg-primary w-[40%] h-full" title="Breakout"></div>
+<div class="bg-yellow-500 w-[40%] h-full" title="Mid"></div>
+<div class="bg-red-500 w-[20%] h-full" title="Rug"></div>
+</div>
+<div class="flex justify-between text-[10px] text-text-muted pt-1">
+<div class="flex items-center gap-1"><div class="size-1.5 rounded-full bg-primary"></div>2 Breakout</div>
+<div class="flex items-center gap-1"><div class="size-1.5 rounded-full bg-yellow-500"></div>2 Mid</div>
+<div class="flex items-center gap-1"><div class="size-1.5 rounded-full bg-red-500"></div>1 Rug</div>
+</div>
+</div>
+</div>
+</section>
+<section class="flex flex-col gap-4">
+<div class="flex items-end justify-between border-b border-surface-border pb-2">
+<div>
+<h2 class="text-lg font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">hub</span>
+                            Beta Discovery Matrix
+                        </h2>
+<p class="text-sm text-text-muted mt-1">Tokens with high narrative correlation and liquidity overlap.</p>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 rounded bg-surface-border/30 hover:bg-surface-border/60 text-xs text-white border border-surface-border transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">tune</span> Filters
+                        </button>
+<button class="px-3 py-1.5 rounded bg-primary text-xs text-white font-medium hover:bg-primary-dark transition-colors shadow-[0_0_10px_rgba(239,68,68,0.4)]">
+                            Refresh Analysis
+                        </button>
+</div>
+</div>
+<div class="w-full overflow-x-auto rounded-lg border border-surface-border bg-[#111318]">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-surface-border bg-[#161920] text-xs uppercase tracking-wider text-text-muted">
+<th class="px-4 py-3 font-medium w-12 text-center">#</th>
+<th class="px-4 py-3 font-medium">Asset</th>
+<th class="px-4 py-3 font-medium w-48">Narrative Similarity</th>
+<th class="px-4 py-3 font-medium text-right">Market Cap</th>
+<th class="px-4 py-3 font-medium text-center">Liquidity</th>
+<th class="px-4 py-3 font-medium">Top Holder Risk</th>
+<th class="px-4 py-3 font-medium text-right">Beta Factor</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-border text-sm">
+<tr class="data-table-row group transition-colors">
+<td class="px-4 py-3 text-center text-text-muted">1</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-zinc-800 rounded-full bg-cover bg-center" data-alt="Token icon placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBo6j3mtzVo7emblgGE9tqBTDdbYw0BxXqLQVfpX2A6lz0y3XVnkmRvEYLKkqLjeIecKFQTYwi_HrzpQXqbC4rvX0_EH-oyVrrB_QuBafWA3TcaOxW70gszMEKEZ3EaIE5q9NGc9DBK4LrIuSzsXUIZJhRDALYMn1W9w8QOMHt0PGdwCXOL5_HOVyrfyN94xQYupX8KgXZzSvOKw1ZB4NoAQHCmkq_e8b03M_8aKldp_6ZNjuvxLSVk5reApntX716fVvhNR_YoSp0');"></div>
+<div>
+<div class="font-bold text-white">$POPCAT</div>
+<div class="text-[10px] text-text-muted font-mono">7h...9zL</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="text-primary font-bold w-8 text-right">98%</span>
+<div class="flex-1 h-1.5 bg-surface-border rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[98%]"></div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3 text-right font-mono text-white">$325.4M</td>
+<td class="px-4 py-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-green-500/10 text-green-500 border border-green-500/20">Deep</span>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-1.5 text-text-muted">
+<span class="material-symbols-outlined text-green-500" style="font-size: 16px;">verified_user</span>
+<span class="text-xs">Distributed</span>
+</div>
+</td>
+<td class="px-4 py-3 text-right font-mono text-white font-bold">1.45x</td>
+</tr>
+<tr class="data-table-row group transition-colors">
+<td class="px-4 py-3 text-center text-text-muted">2</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-zinc-800 rounded-full bg-cover bg-center" data-alt="Token icon placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDgF7nEJVcnb7L7D7bidMZP7t0AEwZRijeZP868Mzays9mEy9PfUSa1Ka6H_2MxYCCSZ-GYxWWoXEDENC4QYL9rdnrdZJj-DnDzAJHJ-US3gJ5-Y-pdKkMYYjHR4U-2Uem1mi9n-VaAfpMA-WU-XsM1Ny-dzpCU6ZRJxty5FnNAf5MqTaiT-fj5NQuP2BDbMWPmRUzf92iRvqmASKPnB1fWDd2hZqYnPsoFeKCXFy3F6qEgTQk1J7gff1elvsFK5cKlzLFUqhML1HY');"></div>
+<div>
+<div class="font-bold text-white">$MYRO</div>
+<div class="text-[10px] text-text-muted font-mono">H2...kP9</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="text-white font-medium w-8 text-right">86%</span>
+<div class="flex-1 h-1.5 bg-surface-border rounded-full overflow-hidden">
+<div class="h-full bg-orange-500 w-[86%]"></div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3 text-right font-mono text-white">$142.1M</td>
+<td class="px-4 py-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-green-500/10 text-green-500 border border-green-500/20">High</span>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-1.5 text-text-muted">
+<span class="material-symbols-outlined text-green-500" style="font-size: 16px;">verified_user</span>
+<span class="text-xs">Renounced</span>
+</div>
+</td>
+<td class="px-4 py-3 text-right font-mono text-white font-bold">1.12x</td>
+</tr>
+<tr class="data-table-row group transition-colors">
+<td class="px-4 py-3 text-center text-text-muted">3</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-zinc-800 rounded-full bg-cover bg-center" data-alt="Token icon placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBMsugCgRL0BHJxdBBawfYFCiOFkBCC5O2qJMo6XaryMBX4dRxSnlevLDkie1uPleSP9OKu1cWN1St4XNSR6Yo2jAHKR2Q1sayO-ABNkK0lGXh0u7OAbuFI8xQ9n3ABberO5po4K3JftCU4xQabv9PFv3grqbdL2oocDQRPoNwoaSZ3aaqneQFl79tsX1HG9-Et0obiHySZ8QYA9MBxNggeP3ehqC3lYZkBf6NLVa3tkEf_WQjCtKumMQeJrsiVkSbwH1rhCSFkjSs');"></div>
+<div>
+<div class="font-bold text-white">$WEN</div>
+<div class="text-[10px] text-text-muted font-mono">Wn...3sX</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="text-white font-medium w-8 text-right">74%</span>
+<div class="flex-1 h-1.5 bg-surface-border rounded-full overflow-hidden">
+<div class="h-full bg-orange-500/70 w-[74%]"></div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3 text-right font-mono text-white">$89.5M</td>
+<td class="px-4 py-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">Mid</span>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-1.5 text-text-muted">
+<span class="material-symbols-outlined text-text-muted" style="font-size: 16px;">check_circle</span>
+<span class="text-xs">Standard</span>
+</div>
+</td>
+<td class="px-4 py-3 text-right font-mono text-white font-bold">0.89x</td>
+</tr>
+<tr class="data-table-row group transition-colors">
+<td class="px-4 py-3 text-center text-text-muted">4</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-zinc-800 rounded-full bg-cover bg-center" data-alt="Token icon placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDnqZIl-esGW4Zui2GWagNI8mwnTmnTBE2GDxMQzQvIvEmURwEjIF0aiLb0WqhotZNSBrMQPIioeDt31IW_2ZHMfMiBbVB3uaPXnEZBicR3hN_8zzb-wvOmSDFXUvKz7_61v_SLoKsseVyILjsHSSfs17HVbSK2kFxFirU8XPOQ7ktZpCrDK5bYdQWh8uOh2jjOUY4olw1VY4AGGz3W3Mkegwo-ud-NAmxxpMk78PBLyPzLxLPkrWOkaXMJ24uEwoBqiACaSQ6Jn9M');"></div>
+<div>
+<div class="font-bold text-white">$NEWCAT</div>
+<div class="text-[10px] text-text-muted font-mono">Nc...9aQ</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="text-white font-medium w-8 text-right">62%</span>
+<div class="flex-1 h-1.5 bg-surface-border rounded-full overflow-hidden">
+<div class="h-full bg-orange-500/50 w-[62%]"></div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3 text-right font-mono text-white">$450k</td>
+<td class="px-4 py-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-red-500/10 text-red-500 border border-red-500/20">Low</span>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-1.5 text-text-muted">
+<span class="material-symbols-outlined text-red-500" style="font-size: 16px;">warning</span>
+<span class="text-xs text-red-400">Mint Auth Active</span>
+</div>
+</td>
+<td class="px-4 py-3 text-right font-mono text-white font-bold">2.41x</td>
+</tr>
+<tr class="data-table-row group transition-colors">
+<td class="px-4 py-3 text-center text-text-muted">5</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-zinc-800 rounded-full bg-cover bg-center" data-alt="Token icon placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAfzz8KWrb9D5jM-gORGc5Y1RzXRGDo6Iw4YgvJqE0g3zOZjeIYlHJfrDi4lr5FleS4DpPclsGxmxWD5zCGYSCgH0OwtcCTPNQ6vIf_sJ5-McHRl5p4KmoIgyxciQJb2JHNlRpi3vkH_sh-G5AIbjLaghad7ppvSPZUMHnPMIU3ZXTRWhZhQw8eMGr3QpSxwr8EYqx3bdHRxnQdfql8mIz1UcJg7BqE1u6a6Aa-jwNBZz9RFpW3y-IM71O911_zscRS2Dbkg1gVNjc');"></div>
+<div>
+<div class="font-bold text-white">$SCAT</div>
+<div class="text-[10px] text-text-muted font-mono">Sc...2mP</div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-2">
+<span class="text-white font-medium w-8 text-right">51%</span>
+<div class="flex-1 h-1.5 bg-surface-border rounded-full overflow-hidden">
+<div class="h-full bg-orange-500/30 w-[51%]"></div>
+</div>
+</div>
+</td>
+<td class="px-4 py-3 text-right font-mono text-white">$1.2M</td>
+<td class="px-4 py-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">Mid</span>
+</td>
+<td class="px-4 py-3">
+<div class="flex items-center gap-1.5 text-text-muted">
+<span class="material-symbols-outlined text-yellow-500" style="font-size: 16px;">info</span>
+<span class="text-xs text-yellow-500/80">Top 10: 24%</span>
+</div>
+</td>
+<td class="px-4 py-3 text-right font-mono text-white font-bold">1.05x</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between px-2 text-xs text-text-muted">
+<p>Showing 5 of 15 beta results</p>
+<div class="flex gap-2">
+<button class="hover:text-white disabled:opacity-50">Previous</button>
+<span class="text-surface-border">|</span>
+<button class="hover:text-white">Next</button>
+</div>
+</div>
+</section>
+<footer class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8 pb-8">
+<div class="bg-[#111318] p-4 rounded-lg border border-surface-border">
+<div class="text-text-muted text-xs uppercase tracking-wider mb-1">Sector Volume</div>
+<div class="text-white font-bold font-mono">$842M <span class="text-green-500 text-xs ml-1">▲ 12%</span></div>
+</div>
+<div class="bg-[#111318] p-4 rounded-lg border border-surface-border">
+<div class="text-text-muted text-xs uppercase tracking-wider mb-1">Active Wallets</div>
+<div class="text-white font-bold font-mono">142k <span class="text-green-500 text-xs ml-1">▲ 5%</span></div>
+</div>
+<div class="bg-[#111318] p-4 rounded-lg border border-surface-border">
+<div class="text-text-muted text-xs uppercase tracking-wider mb-1">New Pairs (1h)</div>
+<div class="text-white font-bold font-mono">24 <span class="text-red-500 text-xs ml-1">▼ 2%</span></div>
+</div>
+<div class="bg-[#111318] p-4 rounded-lg border border-surface-border">
+<div class="text-text-muted text-xs uppercase tracking-wider mb-1">Dominance</div>
+<div class="text-white font-bold font-mono">4.2% <span class="text-text-muted text-xs ml-1">TRX</span></div>
+</div>
+</footer>
+</div>
+</div>
+</main>
+
+</body></html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Betasonchain Terminal - Multi-Chain Explorer</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6366f1",
+                        "primary-dark": "#4f46e5",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0a0a0a",
+                        "surface-dark": "#121212",
+                        "surface-border": "#27272a",
+                        "text-muted": "#a1a1aa",
+                        "danger": "#ef4444",
+                        "success": "#22c55e",
+                        "warning": "#eab308",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121212;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3f3f46;
+        }
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .chain-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .chain-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .chain-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), transparent);
+            pointer-events: none;
+        }
+        .text-gradient {
+            background: linear-gradient(to right, #6366f1, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display h-screen flex overflow-hidden selection:bg-primary selection:text-white">
+    <aside class="w-16 lg:w-64 border-r border-surface-border bg-[#111318] flex flex-col justify-between shrink-0 transition-all duration-300">
+        <div class="flex flex-col">
+            <div class="h-16 flex items-center px-4 lg:px-6 border-b border-surface-border/50">
+                <div class="size-8 rounded bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined text-white text-[20px]">terminal</span>
+                </div>
+                <div class="hidden lg:flex flex-col ml-3">
+                    <h1 class="text-sm font-bold tracking-wider text-white">BETASONCHAIN</h1>
+                    <div class="flex items-center gap-1.5">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                        </span>
+                        <span class="text-[10px] uppercase text-text-muted font-medium tracking-wide">Multi-Chain Hub</span>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex flex-col gap-1 p-3">
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 border border-primary/20 group" href="index.html">
+                    <span class="material-symbols-outlined text-primary group-hover:text-white transition-colors" style="font-size: 20px;">home</span>
+                    <span class="hidden lg:block text-sm font-medium text-white">Home</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-border/50 group transition-all" href="#chains">
+                    <span class="material-symbols-outlined text-text-muted group-hover:text-white transition-colors" style="font-size: 20px;">radar</span>
+                    <span class="hidden lg:block text-sm font-medium text-text-muted group-hover:text-white">Explore Chains</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-border/50 group transition-all" href="#">
+                    <span class="material-symbols-outlined text-text-muted group-hover:text-white transition-colors" style="font-size: 20px;">star</span>
+                    <span class="hidden lg:block text-sm font-medium text-text-muted group-hover:text-white">Watchlist</span>
+                </a>
+            </nav>
+        </div>
+        <div class="p-3 border-t border-surface-border/50">
+            <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-border/50 group transition-all" href="#">
+                <span class="material-symbols-outlined text-text-muted group-hover:text-white transition-colors" style="font-size: 20px;">settings</span>
+                <span class="hidden lg:block text-sm font-medium text-text-muted group-hover:text-white">Settings</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden bg-background-dark relative">
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none z-0"></div>
+        <div class="absolute inset-0 pointer-events-none z-0" style="background-image: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.1), transparent 40%);"></div>
+        
+        <header class="shrink-0 border-b border-surface-border bg-background-dark/95 backdrop-blur-md sticky top-0 z-20 py-8 px-6 lg:px-10">
+            <div class="max-w-7xl mx-auto flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                    <h1 class="text-4xl font-bold text-gradient tracking-tight">Betasonchain Terminal</h1>
+                    <p class="text-text-muted text-sm">Multi-chain crypto explorer and analytics platform</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-6 lg:p-10 z-10 scroll-smooth">
+            <div class="max-w-7xl mx-auto flex flex-col gap-12">
+                <!-- Welcome Section -->
+                <section class="rounded-lg glass-panel p-8 border border-surface-border">
+                    <div class="flex items-start gap-4">
+                        <span class="material-symbols-outlined text-primary text-[32px]">info</span>
+                        <div>
+                            <h2 class="text-lg font-bold text-white mb-2">Welcome to Betasonchain</h2>
+                            <p class="text-text-muted text-sm leading-relaxed">
+                                Explore multiple blockchain networks in one unified interface. Track tokens, analyze wallets, and discover trading opportunities across Bitcoin, Ethereum, BNB Chain, Solana, Base, TON, Tron, and Sui networks.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Chains Section -->
+                <section id="chains" class="flex flex-col gap-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Explore Blockchain Networks</h2>
+                        <p class="text-text-muted text-sm">Select a blockchain to begin analysis and discovery</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Bitcoin -->
+                        <a href="btc.html" class="chain-card rounded-lg bg-[#111318] border border-surface-border p-6 shadow-lg hover:shadow-2xl">
+                            <div class="flex flex-col items-center text-center gap-4 h-full">
+                                <div class="w-16 h-16 rounded-lg bg-[#F7931A]/20 flex items-center justify-center">
+                                    <span class="text-3xl font-bold text-[#F7931A]">₿</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white mb-1">Bitcoin</h3>
+                                    <p class="text-xs text-text-muted mb-3">BTC Network</p>
+                                    <div class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-[#F7931A]/10 text-[#F7931A] border border-[#F7931A]/20">
+                                        <span class="w-2 h-2 rounded-full bg-[#F7931A]"></span>
+                                        Active
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-4 border-t border-surface-border w-full text-xs text-text-muted">
+                                    Largest blockchain
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Ethereum -->
+                        <a href="eth.html" class="chain-card rounded-lg bg-[#111318] border border-surface-border p-6 shadow-lg hover:shadow-2xl">
+                            <div class="flex flex-col items-center text-center gap-4 h-full">
+                                <div class="w-16 h-16 rounded-lg bg-[#8b5cf6]/20 flex items-center justify-center">
+                                    <span class="text-3xl font-bold text-[#8b5cf6]">Ξ</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white mb-1">Ethereum</h3>
+                                    <p class="text-xs text-text-muted mb-3">ETH Network</p>
+                                    <div class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-[#8b5cf6]/10 text-[#8b5cf6] border border-[#8b5cf6]/20">
+                                        <span class="w-2 h-2 rounded-full bg-[#8b5cf6]"></span>
+                                        Active
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-4 border-t border-surface-border w-full text-xs text-text-muted">
+                                    Smart contracts
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- BNB Chain -->
+                        <a href="bnb.html" class="chain-card rounded-lg bg-[#111318] border border-surface-border p-6 shadow-lg hover:shadow-2xl">
+                            <div class="flex flex-col items-center text-center gap-4 h-full">
+                                <div class="w-16 h-16 rounded-lg bg-[#F0B90B]/20 flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-[#F0B90B]">BNB</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white mb-1">BNB Chain</h3>
+                                    <p class="text-xs text-text-muted mb-3">BSC Network</p>
+                                    <div class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-[#F0B90B]/10 text-[#F0B90B] border border-[#F0B90B]/20">
+                                        <span class="w-2 h-2 rounded-full bg-[#F0B90B]"></span>
+                                        Active
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-4 border-t border-surface-border w-full text-xs text-text-muted">
+                                    DeFi Hub
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Solana -->
+                        <a href="solana.html" class="chain-card rounded-lg bg-[#111318] border border-surface-border p-6 shadow-lg hover:shadow-2xl">
+                            <div class="flex flex-col items-center text-center gap-4 h-full">
+                                <div class="w-16 h-16 rounded-lg bg-[#2b6cee]/20 flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-[#2b6cee]">SOL</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white mb-1">Solana</h3>
+                                    <p class="text-xs text-text-muted mb-3">SOL Network</p>
+                                    <div class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-[#2b6cee]/10 text-[#2b6cee] border border-[#2b6cee]/20">
+                                        <span class="w-2 h-2 rounded-full bg-[#2b6cee]"></span>
+                                        Active
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-4 border-t border-surface-border w-full text-xs text-text-muted">
+                                    High Speed
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Base -->
+                        <a href="base.html" class="chain-card rounded-lg bg-[#111318] border border-surface-border p-6 shadow-lg hover:shadow-2xl">
+                            <div class="flex flex-col items-center text-center gap-4 h-full">
+                                <div class="w-16 h-16 rounded-lg bg-[#0052FF]/20 flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-[#0052FF]">BASE</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white mb-1">Base</h3>
+                                    <p class="text-xs text-text-muted mb-3">BASE Network</p>
+                                    <div class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-[#0052FF]/10 text-[#0052FF] border border-[#0052FF]/20">
+                                        <span class="w-2 h-2 rounded-full bg-[#0052FF]"></span>
+                                        Active
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-4 border-t border-surface-border w-full text-xs text-text-muted">
+                                    L2 Scaling
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- TON -->
+                        <a href="ton.html" class="chain-card rounded-lg bg-[#111318] border border-surface-border p-6 shadow-lg hover:shadow-2xl">
+                            <div class="flex flex-col items-center text-center gap-4 h-full">
+                                <div class="w-16 h-16 rounded-lg bg-[#0098EA]/20 flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-[#0098EA]">TON</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white mb-1">TON</h3>
+                                    <p class="text-xs text-text-muted mb-3">TON Network</p>
+                                    <div class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-[#0098EA]/10 text-[#0098EA] border border-[#0098EA]/20">
+                                        <span class="w-2 h-2 rounded-full bg-[#0098EA]"></span>
+                                        Active
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-4 border-t border-surface-border w-full text-xs text-text-muted">
+                                    Messaging Layer
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Tron -->
+                        <a href="tron.html" class="chain-card rounded-lg bg-[#111318] border border-surface-border p-6 shadow-lg hover:shadow-2xl">
+                            <div class="flex flex-col items-center text-center gap-4 h-full">
+                                <div class="w-16 h-16 rounded-lg bg-[#ef4444]/20 flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-[#ef4444]">TRX</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white mb-1">Tron</h3>
+                                    <p class="text-xs text-text-muted mb-3">TRX Network</p>
+                                    <div class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-[#ef4444]/10 text-[#ef4444] border border-[#ef4444]/20">
+                                        <span class="w-2 h-2 rounded-full bg-[#ef4444]"></span>
+                                        Active
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-4 border-t border-surface-border w-full text-xs text-text-muted">
+                                    Stablecoin Hub
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- Sui -->
+                        <a href="sui.html" class="chain-card rounded-lg bg-[#111318] border border-surface-border p-6 shadow-lg hover:shadow-2xl">
+                            <div class="flex flex-col items-center text-center gap-4 h-full">
+                                <div class="w-16 h-16 rounded-lg bg-[#3898EC]/20 flex items-center justify-center">
+                                    <span class="text-2xl font-bold text-[#3898EC]">SUI</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white mb-1">Sui</h3>
+                                    <p class="text-xs text-text-muted mb-3">SUI Network</p>
+                                    <div class="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-medium bg-[#3898EC]/10 text-[#3898EC] border border-[#3898EC]/20">
+                                        <span class="w-2 h-2 rounded-full bg-[#3898EC]"></span>
+                                        Active
+                                    </div>
+                                </div>
+                                <div class="mt-auto pt-4 border-t border-surface-border w-full text-xs text-text-muted">
+                                    Move Language
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Features Section -->
+                <section class="rounded-lg glass-panel p-8 border border-surface-border">
+                    <h2 class="text-xl font-bold text-white mb-6">Platform Features</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="flex gap-3">
+                            <span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">Real-Time Data</h3>
+                                <p class="text-xs text-text-muted mt-1">Live tracking of tokens and transactions</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">Multi-Chain</h3>
+                                <p class="text-xs text-text-muted mt-1">8 major blockchains in one platform</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">Advanced Analytics</h3>
+                                <p class="text-xs text-text-muted mt-1">Detailed wallet and token analysis</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+                            <div>
+                                <h3 class="text-sm font-semibold text-white">Security Focused</h3>
+                                <p class="text-xs text-text-muted mt-1">Risk assessment and red flags</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
